@@ -1,6 +1,8 @@
 body {
 	background-color: #3F3F3F;
 	font-family: arial;
+	margin: 0;
+	padding: 0;
 }
 
 .main-container {
