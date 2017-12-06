@@ -1,0 +1,12 @@
+{
+  "name": "MestreDosCodigos",
+  "description": "A simple zero-configuration command-line http server",
+  "keywords": [
+    "mestre dos códigos",
+    "javascript",
+    "Wilde"
+  ],
+  "scripts": {
+    "start": "http-server -o -p 3000"
+  }
+}
