@@ -1,0 +1,14 @@
+body {
+	background-color: #3F3F3F;
+	font-family: arial;
+	margin: 0;
+	padding: 0;
+}
+
+.main-container {
+	width: 75%;
+	background-color: white;
+	margin: 30px auto 0 auto;
+	border-radius: 10px;
+	padding: 20px;
+}
