@@ -3,7 +3,6 @@ const gulp = require('gulp');
 const gulpLoadPlugins = require('gulp-load-plugins');
 const browserSync = require('browser-sync').create();
 const del = require('del');
-const wiredep = require('wiredep').stream;
 const runSequence = require('run-sequence');
 
 const $ = gulpLoadPlugins();
@@ -127,6 +126,7 @@ gulp.task('serve:dist', ['default'], () => {
 });
 
 gulp.task('build', ['lint', 'html', 'images', 'fonts', 'extras'], () => {
+  gulp.src('.tmp/**').pipe(gulp.dest('dist'));
   return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
 });
 
