@@ -25,11 +25,17 @@
 }
 
 .not-done-exercise {
+	@extend .list-item;
 	@extend .gradient-gray;
 	cursor: not-allowed;
 }
 
 .done-exercise {
+	@extend .list-item;
 	@extend .gradient-blue;
 	cursor: pointer;
+}
+
+a {
+	all: unset;
 }
