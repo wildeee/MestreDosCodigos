@@ -1,1 +1,3 @@
-console.log('\'Allo \'Allo!');
+window.onload = () => {
+	console.log('\'Allo \'Allo!');
+};
