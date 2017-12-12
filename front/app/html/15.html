@@ -3,11 +3,24 @@
 <head>
 	<title>Geolocalização</title>
 	<link rel="stylesheet" href="../styles/base-style.css"/>
+	<link rel="stylesheet" href="../styles/15.css"/>
 </head>
 <body>
 	<div class="main-container">
 		<h2><center>Geolocalização</center></h2>
+		<p id="unavailable-geolocation-message" class="display-none">Geolocalização não está disponível para seu navegador.</p>
+		<p id="denied-geolocation-message" class="display-none">O usuário negou a geolocalização.</p>
+		<div id="your-localization" class="display-none">
+			<div>
+				<p>Suas coordenadas:</p>
+				<p>Latitude: <span id="latitude"></span></p>
+				<p>Longitude: <span id="longitude"></span></p>
+				<p>Você está aqui:</p>
+			</div>
+		</div>
+		<div id="map"></div>
 	</div>
 	<script type="text/javascript" src="../scripts/15.js"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAP24-j_t5cauDmJleVpMQwserMNGA8WxE&callback=mapInitializer" async defer></script>
 </body>
 </html>
