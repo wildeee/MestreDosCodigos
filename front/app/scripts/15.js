@@ -24,11 +24,13 @@ const mapInitializer = (() => {
 		showPosition(position);
 		let map = showMap(position);
 		markMap(map)
+		registerClickListener(map.map);
 	}
 
 	const showNotMarkedMap = (message) => {
 		showGeolocationProblem(message);
-		showMap();
+		let map = showMap();
+		registerClickListener(map.map);
 	}
 
 	const showMap = (position) => {
@@ -68,6 +70,7 @@ const mapInitializer = (() => {
 				}
 			}
 		}
+		mapInitialState.disableDoubleClickZoom = true;
 		return mapInitialState;
 	};
 
@@ -80,6 +83,18 @@ const mapInitializer = (() => {
 			position: map.point,
 			map: map.map
 		})
+	};
+
+	const registerClickListener = (map) => {
+		google.maps.event.addListener(map, 'dblclick', onMapDblClick);
+	};
+
+	const onMapDblClick = (e) => {
+		let coordinates = {
+			lat: e.latLng.lat(),
+			lng: e.latLng.lng()
+		}
+
 	};
 
 	return init;
