@@ -1,43 +1,60 @@
 const mapInitializer = (() => {
 
-	let position;
+	const init = () => {
+		askForGeolocationPermission().then(showMarkedMap, showNotMarkedMap);
+	}
 
-	const showUserDenied = (deny) => {
-		showElement('denied-geolocation-message');
-		handleMap();
+	const askForGeolocationPermission = () => {
+		const getMessagedDenialFunction = (rejectFunction) => {
+			return ((denialDetails) => {
+				rejectFunction('O usuário negou a geolocalização.');
+			});
+		}
+
+		return new Promise((response, reject) => {
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(response, getMessagedDenialFunction(reject));
+			} else {
+				reject('Geolocalização não está disponível para seu navegador.');
+			}
+		});
 	};
 
-	const showElement = (elementID) => {
-		document.getElementById(elementID).classList.remove('display-none');
+	const showMarkedMap = (position) => {
+		showPosition(position);
+		let map = showMap(position);
+		markMap(map)
 	}
 
-	const askForLocation = () => {
-		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(locationAccepted, showUserDenied);
-		} else {
-			showElement('unavailable-geolocation-message');
-		}
+	const showNotMarkedMap = (message) => {
+		showGeolocationProblem(message);
+		showMap();
 	}
 
-	const showLocation = () => {
+	const showMap = (position) => {
+		let mapInitialState = getMapInitialState(position);
+		return {
+			map: getMap(mapInitialState),
+			point: mapInitialState.center
+		};
+	}
+
+	const showPosition = (position) => {
 		showElement('your-localization');
 		document.getElementById('latitude').innerHTML = position.coords.latitude;
 		document.getElementById('longitude').innerHTML = position.coords.longitude;
 	}
 
-	const locationAccepted = (pos) => {
-		position = pos;
-		showLocation();
-		handleMap();
-	};
+	const showGeolocationProblem = (message) => {
+		document.getElementById('geolocation-problem-message').innerHTML = message;
+		showElement('geolocation-problem-message');
+	}
 
-	const handleMap = () => {
-		let mapInitialState = getMapInitialState();
-		let map = getMap(mapInitialState);
-		markMap(map, mapInitialState.center);
-	};
+	const showElement = (elementID) => {
+		document.getElementById(elementID).classList.remove('display-none');
+	}
 
-	const getMapInitialState = () => {
+	const getMapInitialState = (position) => {
 		let mapInitialState = {
 			zoom: 3,
 			center: { lat: 0, lng: 0 }
@@ -58,16 +75,13 @@ const mapInitializer = (() => {
 		return new google.maps.Map(document.getElementById('map'), mapInitialState);
 	};
 
-	const markMap = (map, point) => {
-		if (position === undefined) {
-			return;
-		}
+	const markMap = (map) => {
 		new google.maps.Marker({
-			position: point,
-			map: map
+			position: map.point,
+			map: map.map
 		})
 	};
 
-	return askForLocation;
+	return init;
 
 })();
