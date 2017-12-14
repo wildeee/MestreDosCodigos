@@ -1,5 +1,9 @@
 const mapInitializer = (() => {
 
+	let map;
+	let coordinates;
+	let mark;
+
 	const init = () => {
 		askForGeolocationPermission().then(showMarkedMap, showNotMarkedMap);
 	}
@@ -21,30 +25,34 @@ const mapInitializer = (() => {
 	};
 
 	const showMarkedMap = (position) => {
-		showPosition(position);
-		let map = showMap(position);
-		markMap(map)
-		registerClickListener(map.map);
+		coordinates = {
+			lat: position.coords.latitude,
+			lng: position.coords.longitude
+		};
+		showPosition();
+		showMap();
+		markMap()
+		registerClickListener();
 	}
 
 	const showNotMarkedMap = (message) => {
 		showGeolocationProblem(message);
-		let map = showMap();
-		registerClickListener(map.map);
+		showMap();
+		registerClickListener();
 	}
 
-	const showMap = (position) => {
-		let mapInitialState = getMapInitialState(position);
+	const showMap = () => {
+		let mapInitialState = getMapInitialState();
 		return {
 			map: getMap(mapInitialState),
 			point: mapInitialState.center
 		};
 	}
 
-	const showPosition = (position) => {
+	const showPosition = () => {
 		showElement('your-localization');
-		document.getElementById('latitude').innerHTML = position.coords.latitude;
-		document.getElementById('longitude').innerHTML = position.coords.longitude;
+		document.getElementById('latitude').innerHTML = coordinates.lat;
+		document.getElementById('longitude').innerHTML = coordinates.lng;
 	}
 
 	const showGeolocationProblem = (message) => {
@@ -56,18 +64,15 @@ const mapInitializer = (() => {
 		document.getElementById(elementID).classList.remove('display-none');
 	}
 
-	const getMapInitialState = (position) => {
+	const getMapInitialState = () => {
 		let mapInitialState = {
 			zoom: 3,
 			center: { lat: 0, lng: 0 }
 		};
-		if (position !== undefined) {
+		if (coordinates !== undefined) {
 			mapInitialState = {
 				zoom: 6,
-				center: {
-					lat: position.coords.latitude,
-					lng: position.coords.longitude
-				}
+				center: coordinates
 			}
 		}
 		mapInitialState.disableDoubleClickZoom = true;
@@ -75,26 +80,25 @@ const mapInitializer = (() => {
 	};
 
 	const getMap = (mapInitialState) => {
-		return new google.maps.Map(document.getElementById('map'), mapInitialState);
+		map = new google.maps.Map(document.getElementById('map'), mapInitialState);
 	};
 
-	const markMap = (map) => {
-		new google.maps.Marker({
-			position: map.point,
-			map: map.map
+	const markMap = () => {
+		mark = new google.maps.Marker({
+			position: coordinates,
+			map: map
 		})
 	};
 
-	const registerClickListener = (map) => {
+	const registerClickListener = () => {
 		google.maps.event.addListener(map, 'dblclick', onMapDblClick);
 	};
 
 	const onMapDblClick = (e) => {
-		let coordinates = {
+		coordinates = {
 			lat: e.latLng.lat(),
 			lng: e.latLng.lng()
 		}
-
 	};
 
 	return init;
