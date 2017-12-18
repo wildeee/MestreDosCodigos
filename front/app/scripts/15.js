@@ -18,8 +18,10 @@ const mapInitializer = (() => {
 		}
 	};
 	let mark;
+	let geocoder;
 
 	const init = () => {
+		geocoder = new google.maps.Geocoder;
 		askForGeolocationPermission().then(showMarkedMap, showNotMarkedMap);
 	}
 
@@ -63,8 +65,34 @@ const mapInitializer = (() => {
 	const showPosition = () => {
 		hideElement('geolocation-problem-message');
 		showElement('your-localization');
-		document.getElementById('latitude').innerHTML = coordinates.lat;
-		document.getElementById('longitude').innerHTML = coordinates.lng;
+		let location = {
+			lat: coordinates.lat,
+			lng: coordinates.lng
+		};
+		document.getElementById('latitude').innerHTML = location.lat;
+		document.getElementById('longitude').innerHTML = location.lng;
+		geocoder.geocode({location}, (results, status) => {
+			document.getElementById('address').innerHTML = '';
+			if (status !== 'OK') {
+				return;
+			}
+			showAddress(results[0])
+		});
+	}
+
+
+	const showAddress = (address) => {
+		const addressTypes = [
+			{code: 'postal_code', translate: 'CEP'},
+			{code: 'street_number', translate: 'Número'},
+			{code: 'route', translate: 'Logradouro'},
+			{code: 'administrative_area_level_2', translate: 'Cidade'},
+			{code: 'administrative_area_level_1', translate: 'Estado'},
+			{code: 'country', translate: 'País'}
+		]
+		document.getElementById('address').innerHTML = address.formatted_address;
+		let addressesToShow = address.address_components.filter((addressComponent) => addressComponent.types.some(type => addressTypes.some(addressType => addressType.code === type)))
+		console.log(addressesToShow);
 	}
 
 	const showGeolocationProblem = (message) => {
