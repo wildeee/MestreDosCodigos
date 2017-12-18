@@ -72,16 +72,27 @@ const mapInitializer = (() => {
 		document.getElementById('latitude').innerHTML = location.lat;
 		document.getElementById('longitude').innerHTML = location.lng;
 		geocoder.geocode({location}, (results, status) => {
-			document.getElementById('address').innerHTML = '';
 			if (status !== 'OK') {
 				return;
 			}
-			showAddress(results[0])
+			showAddress(results[0]);
 		});
 	}
 
 
 	const showAddress = (address) => {
+		const showAddressUnit = (addressUnit) => {
+			addressTypes.some(addressType => {
+				if (addressUnit.types.indexOf(addressType.code) !== -1) {
+					appendAddressUnit(addressUnit, addressType.translate);
+					return true;
+				}
+			})
+		};
+		const appendAddressUnit = (addressUnit, unitName) => {
+			if (addressUnit.long_name === 'Unnamed Road') return;
+			document.getElementById('address').innerHTML += '<p>' + unitName + ': ' + addressUnit.long_name + '</p>'
+		};
 		const addressTypes = [
 			{code: 'postal_code', translate: 'CEP'},
 			{code: 'street_number', translate: 'Número'},
@@ -90,9 +101,9 @@ const mapInitializer = (() => {
 			{code: 'administrative_area_level_1', translate: 'Estado'},
 			{code: 'country', translate: 'País'}
 		]
-		document.getElementById('address').innerHTML = address.formatted_address;
+		document.getElementById('address').innerHTML = '';
 		let addressesToShow = address.address_components.filter((addressComponent) => addressComponent.types.some(type => addressTypes.some(addressType => addressType.code === type)))
-		console.log(addressesToShow);
+		addressesToShow.reverse().forEach(showAddressUnit);
 	}
 
 	const showGeolocationProblem = (message) => {
