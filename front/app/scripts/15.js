@@ -19,27 +19,13 @@ const mapInitializer = (() => {
 	};
 	let mark;
 	let geocoder;
+	let addressHandler;
 
 	const init = () => {
 		geocoder = new google.maps.Geocoder;
-		askForGeolocationPermission().then(showMarkedMap, showNotMarkedMap);
+		addressHandler = new AddressScreenHandler('address');
+		geolicationHelper.askForPermission().then(showMarkedMap, showNotMarkedMap);
 	}
-
-	const askForGeolocationPermission = () => {
-		const getMessagedDenialFunction = (rejectFunction) => {
-			return ((denialDetails) => {
-				rejectFunction('O usuário negou a geolocalização.');
-			});
-		}
-
-		return new Promise((response, reject) => {
-			if (navigator.geolocation) {
-				navigator.geolocation.getCurrentPosition(response, getMessagedDenialFunction(reject));
-			} else {
-				reject('Geolocalização não está disponível para seu navegador.');
-			}
-		});
-	};
 
 	const showMarkedMap = (position) => {
 		coordinates.latLng = {
@@ -75,35 +61,8 @@ const mapInitializer = (() => {
 			if (status !== 'OK') {
 				return;
 			}
-			showAddress(results[0]);
+			addressHandler.showAddress(results[0]);
 		});
-	}
-
-
-	const showAddress = (address) => {
-		const showAddressUnit = (addressUnit) => {
-			addressTypes.some(addressType => {
-				if (addressUnit.types.indexOf(addressType.code) !== -1) {
-					appendAddressUnit(addressUnit, addressType.translate);
-					return true;
-				}
-			})
-		};
-		const appendAddressUnit = (addressUnit, unitName) => {
-			if (addressUnit.long_name === 'Unnamed Road') return;
-			document.getElementById('address').innerHTML += '<p>' + unitName + ': ' + addressUnit.long_name + '</p>'
-		};
-		const addressTypes = [
-			{code: 'postal_code', translate: 'CEP'},
-			{code: 'street_number', translate: 'Número'},
-			{code: 'route', translate: 'Logradouro'},
-			{code: 'administrative_area_level_2', translate: 'Cidade'},
-			{code: 'administrative_area_level_1', translate: 'Estado'},
-			{code: 'country', translate: 'País'}
-		]
-		document.getElementById('address').innerHTML = '';
-		let addressesToShow = address.address_components.filter((addressComponent) => addressComponent.types.some(type => addressTypes.some(addressType => addressType.code === type)))
-		addressesToShow.reverse().forEach(showAddressUnit);
 	}
 
 	const showGeolocationProblem = (message) => {
